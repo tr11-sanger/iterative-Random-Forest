@@ -279,19 +279,19 @@ class TreeWeightsMixin(BaseDecisionTree):
             raise ValueError("min_impurity_decrease must be greater than "
                              "or equal to 0")
 
-        presort = self.presort
-        if self.presort == 'deprecated':
-            self.presort = 'auto'
-        # Allow presort to be 'auto', which means True if the dataset is dense,
-        # otherwise it will be False.
-        if self.presort == 'auto' and issparse(X):
-            presort = False
-        elif self.presort == 'auto':
-            presort = True
+#         presort = self.presort
+#         if self.presort == 'deprecated':
+#             self.presort = 'auto'
+#         # Allow presort to be 'auto', which means True if the dataset is dense,
+#         # otherwise it will be False.
+#         if self.presort == 'auto' and issparse(X):
+#             presort = False
+#         elif self.presort == 'auto':
+#             presort = True
 
-        if presort is True and issparse(X):
-            raise ValueError("Presorting is not supported for sparse "
-                             "matrices.")
+#         if presort is True and issparse(X):
+#             raise ValueError("Presorting is not supported for sparse "
+#                              "matrices.")
 
         # If multiple trees are built on the same dataset, we only want to
         # presort once. Splitters now can accept presorted indices if desired,
@@ -302,11 +302,11 @@ class TreeWeightsMixin(BaseDecisionTree):
             X_idx_sorted = np.asfortranarray(np.argsort(X, axis=0),
                                              dtype=np.int32)
 
-        if presort and X_idx_sorted.shape != X.shape:
-            raise ValueError("The shape of X (X.shape = {}) doesn't match "
-                             "the shape of X_idx_sorted (X_idx_sorted"
-                             ".shape = {})".format(X.shape,
-                                                   X_idx_sorted.shape))
+#         if presort and X_idx_sorted.shape != X.shape:
+#             raise ValueError("The shape of X (X.shape = {}) doesn't match "
+#                              "the shape of X_idx_sorted (X_idx_sorted"
+#                              ".shape = {})".format(X.shape,
+#                                                    X_idx_sorted.shape))
 
         # Build tree
         criterion = self.criterion
@@ -327,7 +327,8 @@ class TreeWeightsMixin(BaseDecisionTree):
                                                 min_samples_leaf,
                                                 min_weight_leaf,
                                                 random_state,
-                                                self.presort)
+#                                                 self.presort
+                                               )
         if is_classification:
             self.tree_ = Tree(self.n_features_, self.n_classes_, self.n_outputs_)
         else:
