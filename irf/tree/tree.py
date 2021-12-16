@@ -298,7 +298,7 @@ class TreeWeightsMixin(BaseDecisionTree):
         # but do not handle any presorting themselves. Ensemble algorithms
         # which desire presorting must do presorting themselves and pass that
         # matrix into each tree.
-        if X_idx_sorted is None and presort:
+        if X_idx_sorted is None:  #  and presort
             X_idx_sorted = np.asfortranarray(np.argsort(X, axis=0),
                                              dtype=np.int32)
 
