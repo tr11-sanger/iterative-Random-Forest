@@ -343,7 +343,8 @@ class TreeWeightsMixin(BaseDecisionTree):
                                             min_weight_leaf,
                                             max_depth,
                                             self.min_impurity_decrease,
-                                            min_impurity_split)
+#                                             min_impurity_split
+                                           )
         else:
             builder = BestFirstTreeBuilder(splitter, min_samples_split,
                                            min_samples_leaf,
@@ -351,7 +352,8 @@ class TreeWeightsMixin(BaseDecisionTree):
                                            max_depth,
                                            max_leaf_nodes,
                                            self.min_impurity_decrease,
-                                           min_impurity_split)
+#                                            min_impurity_split
+                                          )
 
         builder.build(self.tree_, X, y, sample_weight, feature_weight,
                       X_idx_sorted)
@@ -378,10 +380,10 @@ class WeightedDecisionTreeClassifier(TreeWeightsMixin, DecisionTreeClassifier):
                  random_state=None,
                  max_leaf_nodes=None,
                  min_impurity_decrease=0.,
-                 min_impurity_split=None,
+#                  min_impurity_split=None,
                  class_weight=None,
-                 presort='deprecated',
-                 feature_weight=None,
+#                  presort='deprecated',
+#                  feature_weight=None,
                  ccp_alpha=0.0):
         self.feature_weight = feature_weight
         super().__init__(
@@ -396,8 +398,8 @@ class WeightedDecisionTreeClassifier(TreeWeightsMixin, DecisionTreeClassifier):
             class_weight=class_weight,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
-            min_impurity_split=min_impurity_split,
-            presort=presort,
+#             min_impurity_split=min_impurity_split,
+#             presort=presort,
             ccp_alpha=ccp_alpha)
 
     
@@ -413,9 +415,9 @@ class WeightedDecisionTreeRegressor(TreeWeightsMixin, DecisionTreeRegressor):
                  random_state=None,
                  max_leaf_nodes=None,
                  min_impurity_decrease=0.,
-                 min_impurity_split=None,
-                 presort='deprecated',
-                 feature_weight=None,
+#                  min_impurity_split=None,
+#                  presort='deprecated',
+#                  feature_weight=None,
                  ccp_alpha=0.0):
         self.feature_weight = feature_weight
         super().__init__(
@@ -429,6 +431,6 @@ class WeightedDecisionTreeRegressor(TreeWeightsMixin, DecisionTreeRegressor):
             max_leaf_nodes=max_leaf_nodes,
             random_state=random_state,
             min_impurity_decrease=min_impurity_decrease,
-            min_impurity_split=min_impurity_split,
-            presort=presort,
+#             min_impurity_split=min_impurity_split,
+#             presort=presort,
             ccp_alpha=ccp_alpha)
