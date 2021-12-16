@@ -61,7 +61,9 @@ cdef class Splitter:
 
     def __cinit__(self, Criterion criterion, SIZE_t max_features,
                   SIZE_t min_samples_leaf, double min_weight_leaf,
-                  object random_state, bint presort):
+                  object random_state, 
+#                   bint presort
+                 ):
         """
         Parameters
         ----------
@@ -102,7 +104,7 @@ cdef class Splitter:
         self.min_samples_leaf = min_samples_leaf
         self.min_weight_leaf = min_weight_leaf
         self.random_state = random_state
-        self.presort = presort
+#         self.presort = presort
 
     def __dealloc__(self):
         """Destructor."""
@@ -259,7 +261,9 @@ cdef class BaseDenseSplitter(Splitter):
 
     def __cinit__(self, Criterion criterion, SIZE_t max_features,
                   SIZE_t min_samples_leaf, double min_weight_leaf,
-                  object random_state, bint presort):
+                  object random_state, 
+#                   bint presort
+                 ):
 
         self.X = NULL
         self.X_sample_stride = 0
@@ -267,12 +271,13 @@ cdef class BaseDenseSplitter(Splitter):
         self.X_idx_sorted_ptr = NULL
         self.X_idx_sorted_stride = 0
         self.sample_mask = NULL
-        self.presort = presort
+#         self.presort = presort
 
     def __dealloc__(self):
-        """Destructor."""
-        if self.presort == 1:
-            free(self.sample_mask)
+#         """Destructor."""
+#         if self.presort == 1:
+#             free(self.sample_mask)
+        return
 
     cdef int init(self,
                   object X,
@@ -296,15 +301,15 @@ cdef class BaseDenseSplitter(Splitter):
         self.X_sample_stride = <SIZE_t> X.strides[0] / <SIZE_t> X.itemsize
         self.X_feature_stride = <SIZE_t> X.strides[1] / <SIZE_t> X.itemsize
 
-        if self.presort == 1:
-            self.X_idx_sorted = X_idx_sorted
-            self.X_idx_sorted_ptr = <INT32_t*> self.X_idx_sorted.data
-            self.X_idx_sorted_stride = (<SIZE_t> self.X_idx_sorted.strides[1] /
-                                        <SIZE_t> self.X_idx_sorted.itemsize)
+#         if self.presort == 1:
+#             self.X_idx_sorted = X_idx_sorted
+#             self.X_idx_sorted_ptr = <INT32_t*> self.X_idx_sorted.data
+#             self.X_idx_sorted_stride = (<SIZE_t> self.X_idx_sorted.strides[1] /
+#                                         <SIZE_t> self.X_idx_sorted.itemsize)
 
-            self.n_total_samples = X.shape[0]
-            safe_realloc(&self.sample_mask, self.n_total_samples)
-            memset(self.sample_mask, 0, self.n_total_samples*sizeof(SIZE_t))
+#             self.n_total_samples = X.shape[0]
+#             safe_realloc(&self.sample_mask, self.n_total_samples)
+#             memset(self.sample_mask, 0, self.n_total_samples*sizeof(SIZE_t))
 
         return 0
 
@@ -317,7 +322,8 @@ cdef class BestSplitter(BaseDenseSplitter):
                                self.min_samples_leaf,
                                self.min_weight_leaf,
                                self.random_state,
-                               self.presort), self.__getstate__())
+#                                self.presort
+                              ), self.__getstate__())
 
     cdef int node_split(self, double impurity, SplitRecord* split,
                         SIZE_t* n_constant_features) nogil except -1:
@@ -373,9 +379,9 @@ cdef class BestSplitter(BaseDenseSplitter):
 
         _init_split(&best, end)
 
-        if self.presort == 1:
-            for p in range(start, end):
-                sample_mask[samples[p]] = 1
+#         if self.presort == 1:
+#             for p in range(start, end):
+#                 sample_mask[samples[p]] = 1
 
         # Sample up to max_features without replacement using a
         # Fisher-Yates-based algorithm (using the local variables `f_i` and
@@ -434,21 +440,22 @@ cdef class BestSplitter(BaseDenseSplitter):
                 # presorting, or by copying the values into an array and
                 # sorting the array in a manner which utilizes the cache more
                 # effectively.
-                if self.presort == 1:
-                    p = start
-                    feature_idx_offset = self.X_idx_sorted_stride * current.feature
+#                 if self.presort == 1:
+#                     p = start
+#                     feature_idx_offset = self.X_idx_sorted_stride * current.feature
 
-                    for i in range(self.n_total_samples): 
-                        j = X_idx_sorted[i + feature_idx_offset]
-                        if sample_mask[j] == 1:
-                            samples[p] = j
-                            Xf[p] = X[self.X_sample_stride * j + feature_offset]
-                            p += 1
-                else:
-                    for i in range(start, end):
-                        Xf[i] = X[self.X_sample_stride * samples[i] + feature_offset]
+#                     for i in range(self.n_total_samples): 
+#                         j = X_idx_sorted[i + feature_idx_offset]
+#                         if sample_mask[j] == 1:
+#                             samples[p] = j
+#                             Xf[p] = X[self.X_sample_stride * j + feature_offset]
+#                             p += 1
+#                 else:
+                for i in range(start, end):
+                    Xf[i] = X[self.X_sample_stride * samples[i] + feature_offset]
 
-                    sort(Xf + start, samples + start, end - start)
+                sort(Xf + start, samples + start, end - start)
+                
                 if Xf[end - 1] <= Xf[start] + FEATURE_THRESHOLD or (self.feature_weight != NULL and self.feature_weight[features[f_j]] == 0):
                     features[f_j] = features[n_total_constants]
                     features[n_total_constants] = current.feature
@@ -525,9 +532,9 @@ cdef class BestSplitter(BaseDenseSplitter):
                                              &best.impurity_right)
 
         # Reset sample mask
-        if self.presort == 1:
-            for p in range(start, end):
-                sample_mask[samples[p]] = 0
+#         if self.presort == 1:
+#             for p in range(start, end):
+#                 sample_mask[samples[p]] = 0
 
         # Respect invariant for constant features: the original order of
         # element in features[:n_known_constants] must be preserved for sibling
@@ -665,7 +672,8 @@ cdef class RandomSplitter(BaseDenseSplitter):
                                  self.min_samples_leaf,
                                  self.min_weight_leaf,
                                  self.random_state,
-                                 self.presort), self.__getstate__())
+#                                  self.presort
+                                ), self.__getstate__())
 
     cdef int node_split(self, double impurity, SplitRecord* split,
                         SIZE_t* n_constant_features) nogil except -1:
@@ -891,7 +899,9 @@ cdef class BaseSparseSplitter(Splitter):
 
     def __cinit__(self, Criterion criterion, SIZE_t max_features,
                   SIZE_t min_samples_leaf, double min_weight_leaf,
-                  object random_state, bint presort):
+                  object random_state, 
+#                   bint presort
+                 ):
         # Parent __cinit__ is automatically called
 
         self.X_data = NULL
@@ -1212,7 +1222,8 @@ cdef class BestSparseSplitter(BaseSparseSplitter):
                                      self.min_samples_leaf,
                                      self.min_weight_leaf,
                                      self.random_state,
-                                     self.presort), self.__getstate__())
+#                                      self.presort
+                                    ), self.__getstate__())
 
     cdef int node_split(self, double impurity, SplitRecord* split,
                         SIZE_t* n_constant_features) nogil except -1:
@@ -1442,7 +1453,8 @@ cdef class RandomSparseSplitter(BaseSparseSplitter):
                                        self.min_samples_leaf,
                                        self.min_weight_leaf,
                                        self.random_state,
-                                       self.presort), self.__getstate__())
+#                                        self.presort
+                                      ), self.__getstate__())
 
     cdef int node_split(self, double impurity, SplitRecord* split,
                         SIZE_t* n_constant_features) nogil except -1:
