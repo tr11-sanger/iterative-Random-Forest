@@ -180,25 +180,25 @@ class TreeWeightsMixin(BaseDecisionTree):
         if isinstance(self.max_features, str):
             if self.max_features == "auto":
                 if is_classification:
-                    max_features = max(1, int(np.sqrt(self.n_features_)))
+                    max_features = max(1, int(np.sqrt(self.n_features_in_)))
                 else:
-                    max_features = self.n_features_
+                    max_features = self.n_features_in_
             elif self.max_features == "sqrt":
-                max_features = max(1, int(np.sqrt(self.n_features_)))
+                max_features = max(1, int(np.sqrt(self.n_features_in_)))
             elif self.max_features == "log2":
-                max_features = max(1, int(np.log2(self.n_features_)))
+                max_features = max(1, int(np.log2(self.n_features_in_)))
             else:
                 raise ValueError(
                     'Invalid value for max_features. Allowed string '
                     'values are "auto", "sqrt" or "log2".')
         elif self.max_features is None:
-            max_features = self.n_features_
+            max_features = self.n_features_in_
         elif isinstance(self.max_features, (numbers.Integral, np.integer)):
             max_features = self.max_features
         else:  # float
             if self.max_features > 0.0:
                 max_features = max(1,
-                                   int(self.max_features * self.n_features_))
+                                   int(self.max_features * self.n_features_in_))
             else:
                 max_features = 0
 
@@ -211,7 +211,7 @@ class TreeWeightsMixin(BaseDecisionTree):
             raise ValueError("min_weight_fraction_leaf must in [0, 0.5]")
         if max_depth <= 0:
             raise ValueError("max_depth must be greater than zero. ")
-        if not (0 < max_features <= self.n_features_):
+        if not (0 < max_features <= self.n_features_in_):
             raise ValueError("max_features must be in (0, n_features]")
         if not isinstance(max_leaf_nodes, (numbers.Integral, np.integer)):
             raise ValueError("max_leaf_nodes must be integral number but was "
@@ -243,10 +243,10 @@ class TreeWeightsMixin(BaseDecisionTree):
                 raise ValueError("Feature weights array has more "
                                  "than one dimension: %d" %
                                  len(feature_weight.shape))
-            if len(feature_weight) != self.n_features_:
+            if len(feature_weight) != self.n_features_in_:
                 raise ValueError("Number of weights=%d does not match "
                                  "number of features=%d" %
-                                 (len(feature_weight), self.n_features_))
+                                 (len(feature_weight), self.n_features_in_))
 
         if expanded_class_weight is not None:
             if sample_weight is not None:
@@ -330,9 +330,9 @@ class TreeWeightsMixin(BaseDecisionTree):
 #                                                 self.presort
                                                )
         if is_classification:
-            self.tree_ = Tree(self.n_features_, self.n_classes_, self.n_outputs_)
+            self.tree_ = Tree(self.n_features_in_, self.n_classes_, self.n_outputs_)
         else:
-            self.tree_ = Tree(self.n_features_, 
+            self.tree_ = Tree(self.n_features_in_, 
                               np.array([1] * self.n_outputs_, dtype=np.intp), 
                               self.n_outputs_)
             
