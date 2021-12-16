@@ -383,7 +383,7 @@ class WeightedDecisionTreeClassifier(TreeWeightsMixin, DecisionTreeClassifier):
 #                  min_impurity_split=None,
                  class_weight=None,
 #                  presort='deprecated',
-#                  feature_weight=None,
+                 feature_weight=None,
                  ccp_alpha=0.0):
         self.feature_weight = feature_weight
         super().__init__(
@@ -417,7 +417,7 @@ class WeightedDecisionTreeRegressor(TreeWeightsMixin, DecisionTreeRegressor):
                  min_impurity_decrease=0.,
 #                  min_impurity_split=None,
 #                  presort='deprecated',
-#                  feature_weight=None,
+                 feature_weight=None,
                  ccp_alpha=0.0):
         self.feature_weight = feature_weight
         super().__init__(
